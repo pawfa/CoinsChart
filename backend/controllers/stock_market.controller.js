@@ -2,14 +2,11 @@ var stocksService = require('../services/stock_market.service');
 
 
 exports.getStock = function(req,res,next) {
+    var name = req.query.name;
 
-    var stocks = stocksService.getStocks().then(function(result){
-            console.log("test");
-        console.log(result);
+    var stocks = stocksService.getStocks(name).then(function(result){
+            return res.json(result);
     });
-    response = {
-        "Hello": 'test'
-    };
 
-    return res.json(response);
+    // return res.json(response);
 };

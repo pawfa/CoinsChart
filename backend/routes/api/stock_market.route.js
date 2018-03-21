@@ -9,7 +9,7 @@ var StockController = require('../../controllers/stock_market.controller');
 
 // Map each API to the Controller FUnctions
 
-router.get('/:id', StockController.getStock);
+router.get('/', StockController.getStock);
 
 // router.delete('/:id',StockController.removeStock);
 
