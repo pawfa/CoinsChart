@@ -7,6 +7,7 @@ import { ChartComponent } from './chart/chart.component';
 import { StockListComponent } from './stock-list/stock-list.component';
 import {ApiService} from './service/api.service';
 import {DataService} from './service/data.service';
+import {HttpClientModule} from '@angular/common/http';
 
 
 @NgModule({
@@ -16,7 +17,8 @@ import {DataService} from './service/data.service';
     StockListComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    HttpClientModule
   ],
   providers: [
     ApiService,

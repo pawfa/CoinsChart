@@ -22,6 +22,7 @@ export class ChartComponent implements OnInit {
       data: [1, 0, 4]
     }]
   };
+  data = '' ;
 
   constructor(private dataService: DataService) { }
 
@@ -30,11 +31,25 @@ export class ChartComponent implements OnInit {
 
   }
 
-  getData(){
-    console.log('odpalamy');
+  getData() {
     this.dataService.getData('MSFT').subscribe(
-      (data) => console.log(data)
+      (data: string) => {
+        this.data  = data;
+        console.log(data); }
     );
+  }
+
+  showData() {
+    // for (let i = 0; i < 10; i++){
+    //   console.log(this.data['Weekly Time Series'][i]);
+    // }
+    console.log(this.data['Weekly Time Series']['2000-01-14']);
+    console.log();
+
+    const keys = Object.keys(this.data['Weekly Time Series']);
+    for (let entry of keys) {
+      console.log(entry); // 1, "string", false
+    }
   }
 
 }

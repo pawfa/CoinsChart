@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import {DataService} from './data.service';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 
 @Injectable()
 export class ApiService {
@@ -13,8 +12,9 @@ export class ApiService {
   }
 
   getData(stockName: string) {
+    const params = new HttpParams().set('name', stockName);
 
-    return this.http.get(this.server + 'api/stock/' + stockName, {headers: this.headers});
+    return this.http.get(this.server + 'api/stock/', {headers: this.headers, params: params});
 
   }
 }

@@ -10,7 +10,7 @@ var options = {
 };
 
 exports.getStocks =  function(stockName){
-    console.log(stockName);
+    console.log(stockName+"stockname");
     return new Promise (function(resolve, reject){
 
 
@@ -18,15 +18,15 @@ exports.getStocks =  function(stockName){
     options.path = '/query?function=TIME_SERIES_WEEKLY&symbol='+symbol+'&apikey='+apiKey;
 
     https.request(options, function(res) {
-        var data;
-        // console.log('STATUS: ' + res.statusCode);
-        // console.log('HEADERS: ' + JSON.stringify(res.headers));
+        var body = '';
+
         res.setEncoding('utf8');
         res.on('data', function (chunk) {
-            data = chunk;
+            body += chunk;
         });
         res.on('end', function(){
-            resolve( data);
+            const data = JSON.parse(body);
+            resolve( data ) ;
         })
     }).end();
     })
