@@ -8,6 +8,7 @@ import { StockListComponent } from './stock-list/stock-list.component';
 import {ApiService} from './service/api.service';
 import {DataService} from './service/data.service';
 import {HttpClientModule} from '@angular/common/http';
+import {ChartModule} from 'angular2-highcharts';
 
 
 @NgModule({
@@ -18,7 +19,8 @@ import {HttpClientModule} from '@angular/common/http';
   ],
   imports: [
     BrowserModule,
-    HttpClientModule
+    HttpClientModule,
+    ChartModule.forRoot(require('highcharts/highstock'))
   ],
   providers: [
     ApiService,
