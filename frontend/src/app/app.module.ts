@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
 
 
 import { AppComponent } from './app.component';
@@ -26,6 +26,8 @@ import {ChartModule} from 'angular2-highcharts';
     ApiService,
     DataService
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  // for removing intellij alert ng: 'chart' is not a known element
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
 export class AppModule { }

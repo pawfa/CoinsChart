@@ -15,7 +15,7 @@ exports.getStocks =  function(stockName){
 
 
     symbol = stockName;
-    options.path = '/query?function=TIME_SERIES_WEEKLY&symbol='+symbol+'&apikey='+apiKey;
+    options.path = '/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&apikey='+apiKey;
 
     https.request(options, function(res) {
         var body = '';

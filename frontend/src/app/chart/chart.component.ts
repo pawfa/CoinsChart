@@ -10,19 +10,23 @@ export class ChartComponent implements OnInit {
 
   // @ViewChild('chartTarget') chartTarget: ElementRef;
   data = '' ;
+  chartData = [];
   chart;
   options;
   constructor(private dataService: DataService) { }
 
   ngOnInit() {
+    this.getData();
     this.options = {
       chart: { type: 'spline' },
+      rangeSelector: {
+        selected: 1
+      },
       title : { text : 'simple chart' },
-      series: [{
-        data: [29.9, 71.5, 106.4, 129.2,123,123,5356,456,7,79,34,3,45,5678,68],
-      }]
+      xAxis: {
+        type: 'datetime',
+      },
     };
-    // setInterval(() => this.chart.series[0].addPoint(Math.random() * 10), 1000);
 
   }
 
@@ -30,21 +34,35 @@ export class ChartComponent implements OnInit {
     this.dataService.getData('MSFT').subscribe(
       (data: string) => {
         this.data  = data;
-        console.log(data); }
+        this.showData(); }
     );
   }
 
   showData() {
-    // for (let i = 0; i < 10; i++){
-    //   console.log(this.data['Weekly Time Series'][i]);
-    // }
-    console.log(this.data['Weekly Time Series']['2000-01-14']);
-    console.log();
-
-    const keys = Object.keys(this.data['Weekly Time Series']);
-    for (let entry of keys) {
-      console.log(entry); // 1, "string", false
+    const keys = Object.keys(this.data['Time Series (Daily)']);
+    console.log(this.data['Time Series (Daily)']);
+    for (let i = 0; i < 10; i++) {
+      this.chartData[i] = [Date.parse(keys[i]), parseInt(this.data['Time Series (Daily)'][keys[i]]['1. open'])];
     }
+    console.log(this.chartData);
+    this.chartData.sort(function(a, b) {
+        return a[0] - b[0];
+      }
+    );
+    console.log(this.chartData);
+    this.chart.addSeries({
+      name: 'MSFT',
+      data: this.chartData
+    });
+
+    this.chart.redraw();
+
+    // for (let entry of keys) {
+    //
+    //   this.chart.series[0].addPoint(entry, false);
+    // }
+    // this.chart.series.data = this.data['Weekly Time Series'];
+
   }
 
   saveInstance(chartInstance) {
