@@ -1,5 +1,7 @@
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {DataService} from '../service/data.service';
+import * as io from 'socket.io-client';
+let helperUtil = require('../scripts/ccc.js');
 
 @Component({
   selector: 'app-chart',
@@ -7,16 +9,26 @@ import {DataService} from '../service/data.service';
   styleUrls: ['./chart.component.css']
 })
 export class ChartComponent implements OnInit {
-
-  // @ViewChild('chartTarget') chartTarget: ElementRef;
-  data = '' ;
   chartData = [];
   chart;
   options;
-  constructor(private dataService: DataService) { }
+  name = 'MSFT';
+  socket: SocketIOClient.Socket;
+  stockNames : Set<JSON>;
+
+  constructor(private dataService: DataService) {
+    this.socket = io.connect('http://localhost:3001');
+  }
 
   ngOnInit() {
-    this.getData();
+
+    this.socket.emit('getStockData', {
+      name: this.name
+    });
+    this.socket.on('sendingStockData', (data: any) => {
+      this.showData(data.msg);
+    });
+
     this.options = {
       chart: { type: 'spline' },
       rangeSelector: {
@@ -31,41 +43,60 @@ export class ChartComponent implements OnInit {
   }
 
   getData() {
-    this.dataService.getData('MSFT').subscribe(
-      (data: string) => {
-        this.data  = data;
-        this.showData(); }
-    );
+    this.socket.emit('getStockData', {
+      name: this.name
+    });
+    // this.dataService.getData(this.name).subscribe(
+    //   (data: string) => {
+    //     this.showData(data); }
+    // );
   }
 
-  showData() {
-    const keys = Object.keys(this.data['Time Series (Daily)']);
-    console.log(this.data['Time Series (Daily)']);
-    for (let i = 0; i < 10; i++) {
-      this.chartData[i] = [Date.parse(keys[i]), parseInt(this.data['Time Series (Daily)'][keys[i]]['1. open'])];
-    }
-    console.log(this.chartData);
-    this.chartData.sort(function(a, b) {
-        return a[0] - b[0];
-      }
-    );
-    console.log(this.chartData);
-    this.chart.addSeries({
-      name: 'MSFT',
-      data: this.chartData
-    });
+  showData(data) {
+    // let res = CCC.CURRENT.unpack(data);
+    let res = helperUtil.unpackMessage(data);
+    console.log(res);
+    console.log(res['FROMSYMBOL']);
+    // console.log(res['PRICE']);
 
-    this.chart.redraw();
+  // console.log(data);
+  //   data.forEach((json, index) => {
 
-    // for (let entry of keys) {
+    // console.log(json);
+
+
+    //   const keys = Object.keys(json['Time Series (Daily)']);
     //
-    //   this.chart.series[0].addPoint(entry, false);
-    // }
-    // this.chart.series.data = this.data['Weekly Time Series'];
+    //   for (let i = 0; i < keys.length; i++) {
+    //     this.chartData[i] = [Date.parse(keys[i]), parseInt(json['Time Series (Daily)'][keys[i]]['1. open'])];
+    //   }
+    //   this.chartData.sort(function (a, b) {
+    //       return a[0] - b[0];
+    //     }
+    //   );
+    //
+    //   // console.log(this.chartData);
+    //   this.chart.addSeries({
+    //     name: json["Meta Data"]["2. Symbol"],
+    //     data: this.chartData
+    //   });
+    //
+    //   this.chart.redraw();
+    // });
+
 
   }
 
   saveInstance(chartInstance) {
     this.chart = chartInstance;
+  }
+
+
+  addNew() {
+    // this.dataService.getData('AMZN').subscribe(
+    //   (data: string) => {
+    //     this.data  = data;
+    //     this.showData(); }
+    // );
   }
 }
