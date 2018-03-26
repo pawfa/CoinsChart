@@ -1,3 +1,10 @@
-<p>
-  stock-list works!
-</p>
+<form action="#" >
+  <div *ngFor="let coin of coins" (change)="setSelected($event.target)">
+  <p>
+    <label>
+      <input name="{{coin['SYMBOL']}}" type="checkbox" class="filled-in"/>
+      <span>{{coin['SYMBOL']}}</span>
+    </label>
+  </p>
+  </div>
+</form>

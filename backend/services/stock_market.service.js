@@ -3,8 +3,6 @@ let options = {
     host: 'min-api.cryptocompare.com',
     method: 'GET'
 };
-// let currencyNames = new Set();
-// currencyNames.add('BTC');
 
 const socket = require('socket.io-client')('wss://streamer.cryptocompare.com');
 
@@ -47,14 +45,11 @@ exports.getCoinData = function(currencyNames){
 
 };
 
-exports.getHistoricalData = function (currName) {
-    currencyNames.add(currName);
-
-    socket.emit('SubAdd', {subs: ['2~Poloniex~' + currName + '~USD']});
+exports.getCurrencies = function (currName) {
 
     return new Promise(function (resolve, reject) {
 
-        options.path = '/data/histoday?fsym=' + currName + '&tsym=USD&limit=30';
+        options.path = '/data/top/volumes?tsym=USD&limit=10';
 
         https.request(options, function (res) {
             let body = '';

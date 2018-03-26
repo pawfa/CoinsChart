@@ -9,7 +9,7 @@ let StockController = require('../../controllers/stock_market.controller');
 
 // Map each API to the Controller FUnctions
 
-router.get('/', StockController.getCoinData);
+router.get('/', StockController.getCurrencies);
 
 
 // Export the Router

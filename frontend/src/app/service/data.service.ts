@@ -4,9 +4,15 @@ import {ApiService} from './api.service';
 @Injectable()
 export class DataService {
 
-  constructor(private apiService: ApiService) { }
+  constructor(private apiService: ApiService) {
+
+  }
 
   getData(currName: string) {
     return this.apiService.getData(currName);
+  }
+
+  getCoins(){
+    return this.apiService.getCoins();
   }
 }

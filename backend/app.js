@@ -11,15 +11,14 @@ let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
 server.listen(3001);
-
+let apiSocket = stocksService.getSocket();
 let currencyNames = new Set();
 currencyNames.add('BTC');
 
 io.on('connection', (socket) => {
 
-    let apiSocket = stocksService.getSocket();
 
-    console.log('new connection made');
+
     Promise.all(stocksService.getCoinData(currencyNames)).then(function (result) {
         console.log(Array.from(currencyNames));
         socket.emit('allCoinData', {
@@ -28,30 +27,29 @@ io.on('connection', (socket) => {
         })
     });
 
-    socket.on('addCoin', (message) => {
 
+    socket.on('addCoin', (message) => {
+        currencyNames.add(message.msg);
         Promise.all(stocksService.getCoinData([message.msg])).then(
             function (result) {
                 console.log(message.msg);
-                socket.emit('oneCoinData', {
-                    msg: result
+                io.sockets.emit('oneCoinData', {
+                    msg: result,
+                    name: message.msg
                 });
                 console.log(message.msg);
 
             }).then(
             apiSocket.emit('SubAdd', {subs: ['2~Poloniex~' + message.msg + '~USD']})
         );
-
     });
 
+});
 
-    apiSocket.on('m', function (message) {
-        io.sockets.emit('sendingCurrData', {
-            msg: message
-        })
-    });
-
-
+apiSocket.on('m', function (message) {
+    io.sockets.emit('sendingCurrData', {
+        msg: message
+    })
 });
 
 // view engine setup

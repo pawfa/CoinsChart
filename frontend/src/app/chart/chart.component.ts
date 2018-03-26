@@ -30,28 +30,19 @@ export class ChartComponent implements OnInit {
       },
     };
 
-
     this.socket.on('allCoinData', (data: any) => {
-      // console.log(data.msg[0]);
-      // this.processData(data.msg[0]);
-      console.log(data.msg[0]);
-      console.log(data);
-
-      for( let curr of data.names){
-        this.addSeries(curr,data.msg)
+      for(let i = 0; i < data.names.length; i++){
+        this.addSeries(data.names[i],data.msg[i] )
       }
 
     });
     this.socket.on('oneCoinData', (data: any) => {
-      // this.processData(data.msg);
-      // console.log(data);
+      this.addSeries(data.name, data.msg[0]);
     });
     this.socket.on('sendingCurrData', (data: any) => {
       // this.processData(data.msg);
-      // console.log(data.msg);
+
     });
-
-
 
   }
 
@@ -63,9 +54,7 @@ export class ChartComponent implements OnInit {
       msg: this.name
     });
 
-    this.socket.on('error', (error) =>{
-      console.log(error+' '+'brak takiej waluty')
-    })
+
 
 
   }
@@ -74,13 +63,12 @@ export class ChartComponent implements OnInit {
     let unpackedData = helperUtil.unpackMessage(data);
     let currency = unpackedData['FROMSYMBOL'];
     let price = unpackedData['PRICE'];
-  // console.log(unpackedData);
+    let flag = unpackedData['FLAGS'];
+  console.log(unpackedData);
+      if(flag != 4){
+        this.addPoints(currency, price);
+      }
 
-    if(!this.chart.series.includes(currency)){
-        this.addSeries(currency,unpackedData);
-    }else{
-      this.addPoints(currency, price);
-    }
 
   }
 
@@ -89,9 +77,8 @@ export class ChartComponent implements OnInit {
     let x = (new Date()).getTime();
     console.log(price);
 
-
       for (let i = 0; i < this.chart.series.length-1;i++ ){
-        console.log(this.chart.series[i]);
+
         if(this.chart.series[i]['name'] === currency){
           price = price || this.chart.series[i].processedYData[this.chart.series[i].processedYData.length - 1];
           this.chart.series[i].addPoint([x,price],false,false);
@@ -105,16 +92,17 @@ export class ChartComponent implements OnInit {
   }
 
   addSeries(name,currData){
-    console.log(currData);
+    console.log(currData['Data']);
+
     this.chart.addSeries({
       name: name,
       data: (function () {
-        // generate an array of random data
+
         let data = [];
 
         for (let i = 0; i < currData['Data'].length; i++) {
-          console.log(new Date(currData['Data'][i]['time']*1000));
-          console.log(currData['Data'][i]['time']);
+          // console.log(new Date(currData['Data'][i]['time']*1000));
+          // console.log(currData['Data'][i]['time']);
           data.push({
             x: currData['Data'][i]['time']*1000,
             y: currData['Data'][i]['open']
