@@ -1,8 +1,8 @@
-var express = require('express');
+let express = require('express');
 
-var router = express.Router();
-var stock_market = require('./api/stock_market.route');
+let router = express.Router();
+let stock_market = require('./api/stock_market.route');
 
-router.use('/stock', stock_market);
+router.use('/currency', stock_market);
 
 module.exports = router;

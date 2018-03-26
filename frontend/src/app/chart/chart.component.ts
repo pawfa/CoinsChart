@@ -9,82 +9,120 @@ let helperUtil = require('../scripts/ccc.js');
   styleUrls: ['./chart.component.css']
 })
 export class ChartComponent implements OnInit {
-  chartData = [];
+
   chart;
   options;
-  name = 'MSFT';
+  name = "BTC";
   socket: SocketIOClient.Socket;
-  stockNames : Set<JSON>;
+  currencies =  new Map<string, number>();
+  numberOfLines = 0;
 
   constructor(private dataService: DataService) {
     this.socket = io.connect('http://localhost:3001');
   }
 
   ngOnInit() {
-
-    this.socket.emit('getStockData', {
-      name: this.name
-    });
-    this.socket.on('sendingStockData', (data: any) => {
-      this.showData(data.msg);
-    });
-
     this.options = {
       chart: { type: 'spline' },
-      rangeSelector: {
-        selected: 1
-      },
       title : { text : 'simple chart' },
       xAxis: {
         type: 'datetime',
       },
     };
 
+
+    this.socket.on('allCoinData', (data: any) => {
+      // console.log(data.msg[0]);
+      // this.processData(data.msg[0]);
+      console.log(data.msg[0]);
+      console.log(data);
+
+      for( let curr of data.names){
+        this.addSeries(curr,data.msg)
+      }
+
+    });
+    this.socket.on('oneCoinData', (data: any) => {
+      // this.processData(data.msg);
+      // console.log(data);
+    });
+    this.socket.on('sendingCurrData', (data: any) => {
+      // this.processData(data.msg);
+      // console.log(data.msg);
+    });
+
+
+
   }
 
   getData() {
-    this.socket.emit('getStockData', {
-      name: this.name
+
+    this.currencies.set(this.name,this.numberOfLines++);
+
+    this.socket.emit('addCoin',{
+      msg: this.name
     });
-    // this.dataService.getData(this.name).subscribe(
-    //   (data: string) => {
-    //     this.showData(data); }
-    // );
+
+    this.socket.on('error', (error) =>{
+      console.log(error+' '+'brak takiej waluty')
+    })
+
+
   }
 
-  showData(data) {
-    // let res = CCC.CURRENT.unpack(data);
-    let res = helperUtil.unpackMessage(data);
-    console.log(res);
-    console.log(res['FROMSYMBOL']);
-    // console.log(res['PRICE']);
+  processData(data){
+    let unpackedData = helperUtil.unpackMessage(data);
+    let currency = unpackedData['FROMSYMBOL'];
+    let price = unpackedData['PRICE'];
+  // console.log(unpackedData);
 
-  // console.log(data);
-  //   data.forEach((json, index) => {
+    if(!this.chart.series.includes(currency)){
+        this.addSeries(currency,unpackedData);
+    }else{
+      this.addPoints(currency, price);
+    }
 
-    // console.log(json);
-
-
-    //   const keys = Object.keys(json['Time Series (Daily)']);
-    //
-    //   for (let i = 0; i < keys.length; i++) {
-    //     this.chartData[i] = [Date.parse(keys[i]), parseInt(json['Time Series (Daily)'][keys[i]]['1. open'])];
-    //   }
-    //   this.chartData.sort(function (a, b) {
-    //       return a[0] - b[0];
-    //     }
-    //   );
-    //
-    //   // console.log(this.chartData);
-    //   this.chart.addSeries({
-    //     name: json["Meta Data"]["2. Symbol"],
-    //     data: this.chartData
-    //   });
-    //
-    //   this.chart.redraw();
-    // });
+  }
 
 
+  addPoints(currency,price) {
+    let x = (new Date()).getTime();
+    console.log(price);
+
+
+      for (let i = 0; i < this.chart.series.length-1;i++ ){
+        console.log(this.chart.series[i]);
+        if(this.chart.series[i]['name'] === currency){
+          price = price || this.chart.series[i].processedYData[this.chart.series[i].processedYData.length - 1];
+          this.chart.series[i].addPoint([x,price],false,false);
+        }else{
+          this.chart.series[i].addPoint([x,this.chart.series[i].processedYData[this.chart.series[i].processedYData.length - 1]],false,false)
+        }
+      }
+      this.chart.redraw();
+
+
+  }
+
+  addSeries(name,currData){
+    console.log(currData);
+    this.chart.addSeries({
+      name: name,
+      data: (function () {
+        // generate an array of random data
+        let data = [];
+
+        for (let i = 0; i < currData['Data'].length; i++) {
+          console.log(new Date(currData['Data'][i]['time']*1000));
+          console.log(currData['Data'][i]['time']);
+          data.push({
+            x: currData['Data'][i]['time']*1000,
+            y: currData['Data'][i]['open']
+          });
+        }
+        return data;
+      }())
+    });
   }
 
   saveInstance(chartInstance) {

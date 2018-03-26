@@ -6,7 +6,7 @@ export class DataService {
 
   constructor(private apiService: ApiService) { }
 
-  getData(stockName: string) {
-    return this.apiService.getData(stockName);
+  getData(currName: string) {
+    return this.apiService.getData(currName);
   }
 }

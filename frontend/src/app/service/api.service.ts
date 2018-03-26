@@ -11,10 +11,10 @@ export class ApiService {
     this.headers = new HttpHeaders().set('Content-Type', 'application/json');
   }
 
-  getData(stockName: string) {
-    const params = new HttpParams().set('name', stockName);
+  getData(currName: string) {
+    const params = new HttpParams().set('name', currName);
 
-    return this.http.get(this.server + 'api/stock/', {headers: this.headers, params: params});
+    return this.http.get(this.server + 'api/currency/', {headers: this.headers, params: params});
 
   }
 }

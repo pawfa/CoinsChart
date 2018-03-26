@@ -1,17 +1,15 @@
-var express = require('express')
+let express = require('express');
 
-var router = express.Router()
+let router = express.Router();
 
 // Getting the Todo Controller that we just created
 
-var StockController = require('../../controllers/stock_market.controller');
+let StockController = require('../../controllers/stock_market.controller');
 
 
 // Map each API to the Controller FUnctions
 
-router.get('/', StockController.getStock);
-
-// router.delete('/:id',StockController.removeStock);
+router.get('/', StockController.getCoinData);
 
 
 // Export the Router

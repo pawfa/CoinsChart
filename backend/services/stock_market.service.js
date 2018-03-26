@@ -1,64 +1,86 @@
 let https = require("https");
-let url = 'www.alphavantage.co';
-let apiKey = 'YBC4DDBX1TSWJH0B';
-let symbol = '';
 let options = {
-    host: url,
+    host: 'min-api.cryptocompare.com',
     method: 'GET'
 };
-let stockNames = new Set();
-let promises = [];
+// let currencyNames = new Set();
+// currencyNames.add('BTC');
 
 const socket = require('socket.io-client')('wss://streamer.cryptocompare.com');
 
-
-socket.on('m', (message) => {console.log( message)});
+socket.on('m', (message) => {
+    console.log(message)
+});
 
 socket.on('connect', () => {
     console.log("connected to coin api");
-        socket.emit('SubAdd', { subs: ['5~CCCAGG~BTC~USD','5~CCCAGG~ETH~USD' ] } );
+    socket.emit('SubAdd', {subs: ['2~Poloniex~' + 'BTC' + '~USD']});
 
 });
-
-// Disconnect from the channel
 socket.on('disconnect', () => console.log('Disconnected.'));
 
 
-exports.getSocket =  function(){
-        return socket;
+exports.getCoinData = function(currencyNames){
+    let promiseArray =[];
+    for (let currency of currencyNames){
+        promiseArray.push(
+         new Promise(function (resolve, reject) {
+
+            options.path = '/data/histoday?fsym=' + currency + '&tsym=USD&limit=30';
+
+            https.request(options, function (res) {
+                let body = '';
+
+                res.setEncoding('utf8');
+                res.on('data', function (chunk) {
+                    body += chunk;
+                });
+                res.on('end', function () {
+                    const data = JSON.parse(body);
+                    resolve(data);
+                })
+            }).end();
+        })
+    )
+    }
+    return promiseArray;
+
 };
 
-exports.addStock = function(stockName){
-    stockNames.add(stockName);
-    console.log(Array.from(stockNames).join().toLowerCase());
-    // socket.emit('subscribe', Array.from(stockNames).join().toLowerCase());
-    // socket.emit('subscribe', 'snap');
+exports.getHistoricalData = function (currName) {
+    currencyNames.add(currName);
+
+    socket.emit('SubAdd', {subs: ['2~Poloniex~' + currName + '~USD']});
+
+    return new Promise(function (resolve, reject) {
+
+        options.path = '/data/histoday?fsym=' + currName + '&tsym=USD&limit=30';
+
+        https.request(options, function (res) {
+            let body = '';
+
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                body += chunk;
+            });
+            res.on('end', function () {
+                const data = JSON.parse(body);
+                resolve(data);
+            })
+        }).end();
+    });
 
 
+};
 
-    // promises.push(
-    // new Promise (function(resolve, reject){
-    //
-    //
-    //     symbol = stockName;
-    //     options.path = '/query?function=TIME_SERIES_DAILY&symbol='+symbol+'&apikey='+apiKey;
-    //
-    //     https.request(options, function(res) {
-    //         let body = '';
-    //
-    //         res.setEncoding('utf8');
-    //         res.on('data', function (chunk) {
-    //             body += chunk;
-    //         });
-    //         res.on('end', function(){
-    //             const data = JSON.parse(body);
-    //             resolve( data ) ;
-    //         })
-    //     }).end();
-    // })
-    // );
+exports.addCoin = function (coinName) {
+    console.log(coinName);
+    currencyNames.add(coinName);
 
+};
 
+exports.getSocket = function () {
+    return socket;
 };
 
 
