@@ -8,10 +8,11 @@ export class DataService {
   socket: SocketIOClient.Socket;
 
   selectedCoinData = new Subject<{}>();
-  selectedCoinName = new Subject<string[]>();
+  selectedCoinName = new Subject();
 
   constructor(private apiService: ApiService) {
-    this.socket = io.connect('http://localhost:3001');
+    // this.socket = io.connect('http://back_charts.pawfa.usermd.net:3001');
+    this.socket = io.connect('http://localhost:3001/');
   }
 
   getData(currName: string) {

@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {DataService} from '../service/data.service';
-import {Subject} from 'rxjs/Subject';
 import {FormArray, FormBuilder} from '@angular/forms';
 
 @Component({
@@ -17,19 +16,21 @@ export class StockListComponent implements OnInit {
   };
   socket;
   form;
-  selectedCoinNameSubject: Subject<string[]>;
+  selectedCoinNameSubject;
 
 
   constructor(private dataService: DataService, private fb: FormBuilder) {
     this.form = this.fb.group({
       coinsSelected: this.buildSkills()
     });
+
     this.socket = dataService.getSocket();
     this.selectedCoinNameSubject = this.dataService.getSelectedCoinName();
   }
 
 
   ngOnInit() {
+
     this.dataService.getCoins().subscribe(
       (data: string[]) => {
         let i = 0;
@@ -52,15 +53,15 @@ export class StockListComponent implements OnInit {
 
     this.selectedCoinNameSubject.asObservable().subscribe(
       (data) => {
-        console.log(this.coins.coinsSelected[0]);
-        for(let currency of data){
+        for(let currency of data[0]){
           let index = this.coins.coinsSelected.findIndex(function(e){
             return e.name == currency
           });
-          if(index != -1){
-            this.coins.coinsSelected[index]['selected'] = !this.coins.coinsSelected[index]['selected'];
+          if(index != -1 ){
+            if(this.coins.coinsSelected[index]['selected'] != data[1]) {
+              this.coins.coinsSelected[index]['selected'] = data[1];
+            }
           }
-
         }
         this.form = this.fb.group({
           coinsSelected: this.buildSkills()
@@ -68,8 +69,6 @@ export class StockListComponent implements OnInit {
 
       }
     );
-
-
 
   }
 
@@ -88,17 +87,14 @@ export class StockListComponent implements OnInit {
 
   setSelected(target) {
     if (target.checked) {
-      this.coinsSelected.push(target.name);
+      // this.selectedCoinNameSubject.next([[target.name], true]);
       this.dataService.getSelectedCoin(target.name);
-
       this.socket.emit('addCoin', {
         msg: target.name
       });
+
     } else {
-      const index: number = this.coinsSelected.indexOf(target.name);
-      if (index !== -1) {
-        this.coinsSelected.splice(index, 1);
-      }
+      // this.selectedCoinNameSubject.next([[target.name], false]);
       this.socket.emit('removeCoin', {
         msg: target.name
       });

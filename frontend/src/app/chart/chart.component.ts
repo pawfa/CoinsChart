@@ -29,11 +29,17 @@ export class ChartComponent implements OnInit {
         type: 'datetime',
       },
     };
+
     this.socket.emit('getInitializationData');
 
     this.selectedCoinData = this.dataService.getSelectedCoinData();
+
+    this.dataService.getSelectedCoinName().asObservable().subscribe(
+      (data) => this.removeSeries(data)
+    );
+
     this.socket.on('allCoinData', (data: any) => {
-      this.dataService.getSelectedCoinName().next(data.names);
+      this.dataService.getSelectedCoinName().next([data.names, true]);
       for(let i = 0; i < data.names.length; i++){
         this.addSeries(data.msg[i],data.names[i])
       }
@@ -44,34 +50,45 @@ export class ChartComponent implements OnInit {
     );
 
     this.socket.on('addedCoin', (data: any) => {
-      this.dataService.getSelectedCoinName().next([data.msg]);
+      this.dataService.getSelectedCoinName().next([[data.msg], true]);
       this.dataService.getSelectedCoin(data.msg).subscribe();
     });
 
     this.socket.on('removedCoin', (data: any) => {
-      this.dataService.getSelectedCoinName().next([data.msg]);
+      this.removeSeries(data.msg);
+      this.dataService.getSelectedCoinName().next([[data.msg], false]);
     });
 
   }
 
   addSeries(currData,name){
+    let index = this.chart.series.findIndex( e => e.name === name);
+    if(index == -1) {
+      if (this.chart.series)
+        this.chart.addSeries({
+          name: name,
+          data: (function () {
 
-    this.chart.addSeries({
-      name: name,
-      data: (function () {
+            let data = [];
 
-        let data = [];
+            for (let i = 0; i < currData['Data'].length; i++) {
+              data.push({
+                x: currData['Data'][i]['time'] * 1000,
+                y: currData['Data'][i]['open']
+              });
+            }
+            return data;
+          }())
+        });
+    }
+  }
 
-        for (let i = 0; i < currData['Data'].length; i++) {
-          data.push({
-            x: currData['Data'][i]['time']*1000,
-            y: currData['Data'][i]['open']
-          });
-        }
-        return data;
-      }())
-    });
-
+  removeSeries(name){
+    console.log(name[0][0]);
+    let index = this.chart.series.findIndex( e => e.name === name[0][0]);
+    if(index != -1){
+      this.chart.series[index].remove(true);
+    }
 
   }
 

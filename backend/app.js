@@ -3,6 +3,8 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
+var cors = require('cors')
+
 let stocksService = require('./services/stock_market.service');
 
 let api = require('./routes/api.route');
@@ -49,7 +51,7 @@ io.on('connection', (socket) => {
 
     socket.on('addCoin', (message) => {
         currencyNames.add(message.msg);
-        socket.broadcast.emit('addedCoin', {
+        io.sockets.emit('addedCoin', {
             msg: message.msg,
             selected: true
         });
@@ -57,8 +59,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('removeCoin', (message) => {
-            currencyNames.delete(index);
-        socket.broadcast.emit('removedCoin', {
+            currencyNames.delete(message.msg);
+        io.sockets.emit('removedCoin', {
             msg: message.msg,
             selected: false
         });
@@ -74,7 +76,6 @@ apiSocket.on('m', function (message) {
         msg: message
     })
 });
-
 // view engine setup
 // app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -84,11 +85,12 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use(cors());
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 app.use(function (req, res, next) {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    // res.setHeader('Access-Control-Allow-Origin', 'http://charts.pawfa.usermd.net');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("Access-Control-Allow-Credentials", "true");
