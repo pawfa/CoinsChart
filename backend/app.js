@@ -13,38 +13,61 @@ let io = require('socket.io')(server);
 server.listen(3001);
 let apiSocket = stocksService.getSocket();
 let currencyNames = new Set();
-currencyNames.add('BTC');
 
 io.on('connection', (socket) => {
 
-
-
-    Promise.all(stocksService.getCoinData(currencyNames)).then(function (result) {
-        console.log(Array.from(currencyNames));
-        socket.emit('allCoinData', {
-            msg: result,
-            names: Array.from(currencyNames)
-        })
+    socket.on('getInitializationData', () => {
+        if (currencyNames.size > 0) {
+            Promise.all(stocksService.getCoinData(currencyNames)).then(function (result) {
+                socket.emit('allCoinData', {
+                    msg: result,
+                    names: Array.from(currencyNames)
+                })
+            });
+        }
     });
 
+    // socket.on('addCoin', (message) => {
+    //
+    //     let arr = message.msg;
+    //     let diff = Array.from(arr).filter(x => arr.indexOf(x) < 0 );
+    //     currencyNames.add(message.msg);
+    //     console.log(diff+"difference");
+    //     Promise.all(stocksService.getCoinData(diff)).then(
+    //
+    //         function (result) {
+    //             // console.log(result);
+    //             io.sockets.emit('allCoinData', {
+    //                 msg: result,
+    //                 names: diff
+    //             });
+    //
+    //         }).then(
+    //         apiSocket.emit('SubAdd', {subs: ['2~Poloniex~' + message.msg + '~USD']})
+    //     );
+    // });
 
     socket.on('addCoin', (message) => {
         currencyNames.add(message.msg);
-        Promise.all(stocksService.getCoinData([message.msg])).then(
-            function (result) {
-                console.log(message.msg);
-                io.sockets.emit('oneCoinData', {
-                    msg: result,
-                    name: message.msg
-                });
-                console.log(message.msg);
+        socket.broadcast.emit('addedCoin', {
+            msg: message.msg,
+            selected: true
+        });
 
-            }).then(
-            apiSocket.emit('SubAdd', {subs: ['2~Poloniex~' + message.msg + '~USD']})
-        );
+    });
+
+    socket.on('removeCoin', (message) => {
+            currencyNames.delete(index);
+        socket.broadcast.emit('removedCoin', {
+            msg: message.msg,
+            selected: false
+        });
+
     });
 
 });
+
+
 
 apiSocket.on('m', function (message) {
     io.sockets.emit('sendingCurrData', {

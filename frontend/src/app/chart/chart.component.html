@@ -2,7 +2,3 @@
 <div class="container" >
 <chart type="StockChart" [options]="options" (load)="saveInstance($event.context)"></chart>
 </div>
-<button type="button" (click)="getData()">GetData</button>
-<button type="button" (click)="showData()">Show</button>
-<button type="button" (click)="addNew()">Add</button>
-<input [(ngModel)]="name">

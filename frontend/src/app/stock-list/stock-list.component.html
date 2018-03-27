@@ -1,10 +1,11 @@
-<form action="#" >
-  <div *ngFor="let coin of coins" (change)="setSelected($event.target)">
-  <p>
+
+<form [formGroup]="form">
+  <div *ngFor="let coin of getCoins.controls; let i=index" (change)="setSelected($event.target)">
     <label>
-      <input name="{{coin['SYMBOL']}}" type="checkbox" class="filled-in"/>
-      <span>{{coin['SYMBOL']}}</span>
+    <input name="{{coins.coinsSelected[i].name}}" type="checkbox" [formControl]="coin"/>
+      <span>{{coins.coinsSelected[i].name}}</span>
     </label>
-  </p>
+    <!--{{ form.value | json }}-->
   </div>
+  <button type="submit">Submit</button>
 </form>

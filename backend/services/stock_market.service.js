@@ -12,7 +12,7 @@ socket.on('m', (message) => {
 
 socket.on('connect', () => {
     console.log("connected to coin api");
-    socket.emit('SubAdd', {subs: ['2~Poloniex~' + 'BTC' + '~USD']});
+    // socket.emit('SubAdd', {subs: ['2~Poloniex~' + 'BTC' + '~USD']});
 
 });
 socket.on('disconnect', () => console.log('Disconnected.'));
@@ -24,7 +24,7 @@ exports.getCoinData = function(currencyNames){
         promiseArray.push(
          new Promise(function (resolve, reject) {
 
-            options.path = '/data/histoday?fsym=' + currency + '&tsym=USD&limit=30';
+            options.path = '/data/histoday?fsym=' + currency + '&tsym=USD&limit=100';
 
             https.request(options, function (res) {
                 let body = '';
@@ -45,7 +45,7 @@ exports.getCoinData = function(currencyNames){
 
 };
 
-exports.getCurrencies = function (currName) {
+exports.getCurrencies = function () {
 
     return new Promise(function (resolve, reject) {
 

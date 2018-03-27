@@ -9,7 +9,7 @@ import {ApiService} from './service/api.service';
 import {DataService} from './service/data.service';
 import {HttpClientModule} from '@angular/common/http';
 import {ChartModule} from 'angular2-highcharts';
-import {FormsModule} from '@angular/forms';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 
 @NgModule({
@@ -22,6 +22,7 @@ import {FormsModule} from '@angular/forms';
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    ReactiveFormsModule,
     ChartModule.forRoot(require('highcharts/highstock'))
   ],
   providers: [

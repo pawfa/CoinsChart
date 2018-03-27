@@ -6,6 +6,7 @@ export class ApiService {
 
   private server = 'http://localhost:3000/';
   private headers: HttpHeaders;
+  private apiHistoricalData = 'https://min-api.cryptocompare.com/data/histoday?fsym=';
 
 
   constructor(private http: HttpClient) {
@@ -19,5 +20,10 @@ export class ApiService {
 
   getCoins(){
     return this.http.get(this.server + 'api/currencies/', {headers: this.headers});
+  }
+
+
+  getSelectedCoin(selectedCoin: string){
+    return this.http.get(this.apiHistoricalData + selectedCoin+'&tsym=USD&limit=100', {headers: this.headers});
   }
 }
