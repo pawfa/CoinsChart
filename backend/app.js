@@ -14,19 +14,47 @@ let server = require('http').Server(app);
 let io = require('socket.io')(server);
 server.listen(3001);
 let apiSocket = stocksService.getSocket();
-let currencyNames = new Set();
+let currencyNames = [];
+let currencyHistoricalData = [];
+stocksService.getCurrencies().then(
+    function (result) {
+        let arr = [];
+        let i = 0;
+        result['Data'].map((e) => {
+            currencyNames.push(
+                {
+                    name: e['SYMBOL'],
+                    selected: false,
+                    id: i++
+                }
+            );
+            arr.push(stocksService.getCoinData(e['SYMBOL']), e['SYMBOL']);
+        });
+        return Promise.all(arr);
+    }
+).then(
+    (e) =>currencyHistoricalData = e
+);
+// console.log(arr);
+
 
 io.on('connection', (socket) => {
 
     socket.on('getInitializationData', () => {
-        if (currencyNames.size > 0) {
-            Promise.all(stocksService.getCoinData(currencyNames)).then(function (result) {
-                socket.emit('allCoinData', {
-                    msg: result,
-                    names: Array.from(currencyNames)
-                })
-            });
-        }
+
+        socket.emit('coinsList', {
+            msg: currencyNames,
+            coinsData: currencyHistoricalData
+        })
+    });
+
+
+    socket.on('changeCoinArray', (message) => {
+        console.log("added rray" + message.msg);
+        currencyNames = message.msg;
+        socket.broadcast.emit('changeCoinArray', {
+            msg: message.msg
+        });
     });
 
     // socket.on('addCoin', (message) => {
@@ -49,26 +77,25 @@ io.on('connection', (socket) => {
     //     );
     // });
 
-    socket.on('addCoin', (message) => {
-        currencyNames.add(message.msg);
-        io.sockets.emit('addedCoin', {
-            msg: message.msg,
-            selected: true
-        });
+    // socket.on('addCoin', (message) => {
+    //     console.log("added coin"+message.msg);
+    //     currencyNames.add(message.msg);
+    //     socket.broadcast.emit('addedCoin', {
+    //         msg: message.msg,
+    //         selected: true
+    //     });
+    // });
 
-    });
-
-    socket.on('removeCoin', (message) => {
-            currencyNames.delete(message.msg);
-        io.sockets.emit('removedCoin', {
-            msg: message.msg,
-            selected: false
-        });
-
-    });
+    // socket.on('removeCoin', (message) => {
+    //     console.log(message.msg);
+    //     currencyNames.delete(message.msg);
+    //     io.sockets.emit('removedCoin', {
+    //         msg: message.msg,
+    //         selected: false
+    //     });
+    // });
 
 });
-
 
 
 apiSocket.on('m', function (message) {

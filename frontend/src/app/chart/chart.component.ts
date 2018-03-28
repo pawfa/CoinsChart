@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {DataService} from '../service/data.service';
 import * as io from 'socket.io-client';
 import {Observable} from 'rxjs/Observable';
+import {forkJoin} from 'rxjs/observable/forkJoin';
 let helperUtil = require('../scripts/ccc.js');
 
 @Component({
@@ -15,7 +16,9 @@ export class ChartComponent implements OnInit {
   options;
   name = "";
   socket: SocketIOClient.Socket;
-  selectedCoinData: Observable<{}>;
+  selectedCoinData =[];
+  coinsList;
+  coinsSelection;
 
   constructor(private dataService: DataService) {
     this.socket = dataService.getSocket();
@@ -31,65 +34,82 @@ export class ChartComponent implements OnInit {
     };
 
     this.socket.emit('getInitializationData');
-
-    this.selectedCoinData = this.dataService.getSelectedCoinData();
-
-    this.dataService.getSelectedCoinName().asObservable().subscribe(
-      (data) => this.removeSeries(data)
-    );
-
-    this.socket.on('allCoinData', (data: any) => {
-      this.dataService.getSelectedCoinName().next([data.names, true]);
-      for(let i = 0; i < data.names.length; i++){
-        this.addSeries(data.msg[i],data.names[i])
+    this.coinsSelection = this.dataService.getCoinsSelection();
+    this.coinsSelection.subscribe(
+      (e) => {
+        let index = this.selectedCoinData.indexOf(e[0]);
+        if(e[1]){
+          this.addSeries(this.selectedCoinData[index-1]['Data'],e[0]);
+        }else{
+          this.removeSeries(e[0]);
+        }
       }
-    });
-
-    this.selectedCoinData.subscribe(
-      (coinData) => this.addSeries(coinData['data'],coinData['selectedCoin'])
     );
 
-    this.socket.on('addedCoin', (data: any) => {
-      this.dataService.getSelectedCoinName().next([[data.msg], true]);
-      this.dataService.getSelectedCoin(data.msg).subscribe();
-    });
+    this.socket.on('coinsList',
 
-    this.socket.on('removedCoin', (data: any) => {
-      this.removeSeries(data.msg);
-      this.dataService.getSelectedCoinName().next([[data.msg], false]);
-    });
+      (data) => {
+      console.log(data);
+        this.coinsList = data.msg;
+        this.selectedCoinData = data.coinsData;
+        let trueArr = data.msg.filter((e) => e.selected === true);
+        for (let coin of trueArr){
+          let index = data.coinsData.indexOf(coin.name);
+          this.addSeries(data.coinsData[index-1]['Data'],coin.name);
+        }
+      }
+    );
 
+    this.socket.on('changeCoinArray', (data: any) => {
+      let coins = this.coinsList;
+      let diff = data.msg.filter(function(e){
+        return !coins.some(function(obj2) {
+          return e.name === obj2.name && e.selected === obj2.selected;
+        });
+      });
+      console.log(diff);
+      this.coinsList = data.msg;
+      if (diff != undefined) {
+        if (diff[0].selected) {
+          let index = this.selectedCoinData.indexOf(diff[0].name);
+          this.addSeries(this.selectedCoinData[index - 1]['Data'], diff[0].name);
+        } else {
+          this.removeSeries(diff[0].name)
+        }
+      }
+      // for (let coin of diff){
+      //   console.log(coin.name);
+      //   let index = data.coinsData.indexOf(coin.name);
+      //
+      // }
+    });
   }
 
-  addSeries(currData,name){
-    let index = this.chart.series.findIndex( e => e.name === name);
-    if(index == -1) {
-      if (this.chart.series)
+  addSeries(coinData, coinName){
+
         this.chart.addSeries({
-          name: name,
+          name: coinName,
           data: (function () {
 
             let data = [];
 
-            for (let i = 0; i < currData['Data'].length; i++) {
+            for (let i = 0; i < coinData.length; i++) {
               data.push({
-                x: currData['Data'][i]['time'] * 1000,
-                y: currData['Data'][i]['open']
+                x: coinData[i]['time'] * 1000,
+                y: coinData[i]['open']
               });
             }
             return data;
           }())
         });
     }
-  }
 
   removeSeries(name){
-    console.log(name[0][0]);
-    let index = this.chart.series.findIndex( e => e.name === name[0][0]);
-    if(index != -1){
-      this.chart.series[index].remove(true);
-    }
 
+      let index = this.chart.series.findIndex( e => e.name === name);
+      if(index != -1){
+        this.chart.series[index].remove(true);
+      }
   }
 
 

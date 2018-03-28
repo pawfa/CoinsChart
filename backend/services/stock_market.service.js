@@ -19,12 +19,10 @@ socket.on('disconnect', () => console.log('Disconnected.'));
 
 
 exports.getCoinData = function(currencyNames){
-    let promiseArray =[];
-    for (let currency of currencyNames){
-        promiseArray.push(
-         new Promise(function (resolve, reject) {
 
-            options.path = '/data/histoday?fsym=' + currency + '&tsym=USD&limit=100';
+        return new Promise(function (resolve, reject) {
+
+            options.path = '/data/histoday?fsym=' + currencyNames + '&tsym=USD&limit=100';
 
             https.request(options, function (res) {
                 let body = '';
@@ -39,9 +37,6 @@ exports.getCoinData = function(currencyNames){
                 })
             }).end();
         })
-    )
-    }
-    return promiseArray;
 
 };
 

@@ -10,6 +10,7 @@ export class ApiService {
   private apiHistoricalData = 'https://min-api.cryptocompare.com/data/histoday?fsym=';
 
 
+
   constructor(private http: HttpClient) {
     this.headers = new HttpHeaders().set('Content-Type', 'application/json');
   }

@@ -16,7 +16,7 @@ export class StockListComponent implements OnInit {
   };
   socket;
   form;
-  selectedCoinNameSubject;
+  coinsSelection;
 
 
   constructor(private dataService: DataService, private fb: FormBuilder) {
@@ -25,51 +25,26 @@ export class StockListComponent implements OnInit {
     });
 
     this.socket = dataService.getSocket();
-    this.selectedCoinNameSubject = this.dataService.getSelectedCoinName();
+    this.coinsSelection = this.dataService.getCoinsSelection();
   }
 
 
   ngOnInit() {
-
-    this.dataService.getCoins().subscribe(
-      (data: string[]) => {
-        let i = 0;
-        data['Data'].forEach(data => {
-          let obj = {
-            name: '',
-            selected: false,
-            id :0
-          };
-          obj.name = data['SYMBOL'];
-          obj.selected = false;
-          obj.id = i++;
-          this.coins.coinsSelected.push(obj);
+        this.socket.on('coinsList',
+          (data) => {
+          this.coins.coinsSelected = data.msg;
+          this.form = this.fb.group({
+              coinsSelected: this.buildSkills()
+            })
         });
-        this.form = this.fb.group({
-          coinsSelected: this.buildSkills()
-        });
-      }
-    );
 
-    this.selectedCoinNameSubject.asObservable().subscribe(
+    this.socket.on('changeCoinArray',
       (data) => {
-        for(let currency of data[0]){
-          let index = this.coins.coinsSelected.findIndex(function(e){
-            return e.name == currency
-          });
-          if(index != -1 ){
-            if(this.coins.coinsSelected[index]['selected'] != data[1]) {
-              this.coins.coinsSelected[index]['selected'] = data[1];
-            }
-          }
-        }
+        this.coins.coinsSelected = data.msg;
         this.form = this.fb.group({
           coinsSelected: this.buildSkills()
-        });
-
-      }
+        })}
     );
-
   }
 
   get getCoins(): FormArray {
@@ -86,19 +61,19 @@ export class StockListComponent implements OnInit {
   }
 
   setSelected(target) {
+    var arr = this.coins.coinsSelected;
     if (target.checked) {
-      // this.selectedCoinNameSubject.next([[target.name], true]);
-      this.dataService.getSelectedCoin(target.name);
-      this.socket.emit('addCoin', {
-        msg: target.name
-      });
-
+      this.coinsSelection.next([target.name,true]);
+      arr.filter((e) => e.name === target.name).map( (e) => e.selected = true);
     } else {
-      // this.selectedCoinNameSubject.next([[target.name], false]);
-      this.socket.emit('removeCoin', {
-        msg: target.name
-      });
+      this.coinsSelection.next([target.name,false]);
+      arr.filter((e) => e.name === target.name).map( (e) => e.selected = false);
     }
+
+    this.socket.emit('changeCoinArray', {
+      msg: this.coins.coinsSelected
+    });
+
   }
 
 
