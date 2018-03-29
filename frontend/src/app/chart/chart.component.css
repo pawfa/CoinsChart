@@ -1,7 +1,8 @@
 chart{
-  display: block;
+  /*width: 200px;*/
+  display: inline-block;
 }
 .container{
   margin: 50px auto;
-  width: 60%;
+  width: 100%;
 }

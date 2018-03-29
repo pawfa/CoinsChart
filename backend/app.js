@@ -13,9 +13,12 @@ let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
 server.listen(3001);
+
 let apiSocket = stocksService.getSocket();
 let currencyNames = [];
 let currencyHistoricalData = [];
+let coinLive = '';
+
 stocksService.getCurrencies().then(
     function (result) {
         let arr = [];
@@ -33,15 +36,13 @@ stocksService.getCurrencies().then(
         return Promise.all(arr);
     }
 ).then(
-    (e) =>currencyHistoricalData = e
+    (e) => currencyHistoricalData = e
 );
-// console.log(arr);
-
 
 io.on('connection', (socket) => {
 
     socket.on('getInitializationData', () => {
-
+        console.log("przesylam poczatkowe dane");
         socket.emit('coinsList', {
             msg: currencyNames,
             coinsData: currencyHistoricalData
@@ -57,26 +58,23 @@ io.on('connection', (socket) => {
         });
     });
 
-    // socket.on('addCoin', (message) => {
-    //
-    //     let arr = message.msg;
-    //     let diff = Array.from(arr).filter(x => arr.indexOf(x) < 0 );
-    //     currencyNames.add(message.msg);
-    //     console.log(diff+"difference");
-    //     Promise.all(stocksService.getCoinData(diff)).then(
-    //
-    //         function (result) {
-    //             // console.log(result);
-    //             io.sockets.emit('allCoinData', {
-    //                 msg: result,
-    //                 names: diff
-    //             });
-    //
-    //         }).then(
-    //         apiSocket.emit('SubAdd', {subs: ['2~Poloniex~' + message.msg + '~USD']})
-    //     );
-    // });
+    socket.on('getCoinLive', (message) => {
+        console.log(coinLive);
+        if(!(coinLive === '')){
+            console.log('remove sub'+ coinLive)
+            apiSocket.emit('SubRemove',{subs: ['2~Poloniex~' + coinLive + '~USD']})
+        }
+        coinLive = message.msg;
+        apiSocket.emit('SubAdd', {subs: ['2~Poloniex~' + message.msg + '~USD']})
 
+    });
+
+    apiSocket.on('m', (e) => {
+        io.sockets.emit('coinLiveData', {
+            msg: e,
+            name: coinLive
+        })
+    });
     // socket.on('addCoin', (message) => {
     //     console.log("added coin"+message.msg);
     //     currencyNames.add(message.msg);
@@ -116,8 +114,8 @@ app.use(cors());
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-    // res.setHeader('Access-Control-Allow-Origin', 'http://charts.pawfa.usermd.net');
+    // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    res.setHeader('Access-Control-Allow-Origin', 'http://charts.pawfa.usermd.net');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, DELETE');
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     res.setHeader("Access-Control-Allow-Credentials", "true");

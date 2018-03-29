@@ -12,6 +12,7 @@ import {ChartModule} from 'angular2-highcharts';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,14 +24,15 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    ChartModule.forRoot(require('highcharts/highstock'))
+    ChartModule.forRoot(
+      require('highcharts/highstock'),
+    require('highcharts/modules/no-data-to-display')
+    )
   ],
   providers: [
     ApiService,
     DataService
   ],
-  bootstrap: [AppComponent],
-  // for removing intellij alert ng: 'chart' is not a known element
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  bootstrap: [AppComponent]
 })
 export class AppModule { }

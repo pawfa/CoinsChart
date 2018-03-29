@@ -1,4 +1,9 @@
-<!--<div id="container" style="width:100%; height:400px;" #chartTarget></div>-->
+
+<script src="https://code.highcharts.com/modules/no-data-to-display.js"></script>
 <div class="container" >
-<chart type="StockChart" [options]="options" (load)="saveInstance($event.context)"></chart>
+<chart type="StockChart" [options]="optionsLong" (load)="saveInstanceLong($event.context)" >
+  <series (click)="onSeriesClick($event)">
+  </series>
+</chart>
+  <chart [options]="optionsLive" (load)="saveInstanceLive($event.context)"></chart>
 </div>
