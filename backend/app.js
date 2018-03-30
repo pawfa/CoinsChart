@@ -69,12 +69,7 @@ io.on('connection', (socket) => {
 
     });
 
-    apiSocket.on('m', (e) => {
-        io.sockets.emit('coinLiveData', {
-            msg: e,
-            name: coinLive
-        })
-    });
+
     // socket.on('addCoin', (message) => {
     //     console.log("added coin"+message.msg);
     //     currencyNames.add(message.msg);
@@ -95,10 +90,10 @@ io.on('connection', (socket) => {
 
 });
 
-
-apiSocket.on('m', function (message) {
-    io.sockets.emit('sendingCurrData', {
-        msg: message
+apiSocket.on('m', (e) => {
+    io.sockets.emit('coinLiveData', {
+        msg: e,
+        name: coinLive
     })
 });
 // view engine setup

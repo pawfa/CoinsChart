@@ -20,8 +20,8 @@ export class ChartComponent implements OnInit {
   selectedCoinData = [];
   coinsList;
   coinsSelection;
-  positiveValue = 1;
-  negativeValue = -1;
+  xAxis = 0;
+
 
   constructor(private dataService: DataService) {
     this.socket = dataService.getSocket();
@@ -49,15 +49,41 @@ export class ChartComponent implements OnInit {
 
     this.optionsLive = {
       chart: {type: 'spline'},
-      title: {text: 'simple chart'},
+      title: {text: 'Coin price change'},
 
       xAxis: {
-        type: 'linear',
+        type: 'datetime',
       },
       series: [{
-        data: [0]
+        name: 'Price change',
+        data: [],
+        color: '#00b200'
       }],
-      lang: {noData: "No data to display"}
+      yAxis:{
+        title: {
+          enabled: true,
+          text: 'Percentage change',
+          style: {
+            fontWeight: 'normal'
+          }
+      },
+        plotLines: [{
+          value: 0,
+          width: 3,
+          color: 'silver'
+        }],
+        labels: {
+          formatter: function() {
+            return (this.value > 0 ? '+' : '') + this.value + '%';
+          }
+        },
+      },
+      lang: {noData: "No data to display"},
+      plotOptions: {
+        series: {
+          compare: 'percent'
+        }
+      },
     };
 
     this.socket.emit('getInitializationData');
@@ -106,12 +132,12 @@ export class ChartComponent implements OnInit {
 
 
     this.socket.on('coinLiveData', (data)=>{
-      if(this.chartLive.series[0].name === data.name){
+      // if(this.chartLive.series[0].name === data.name){
         console.log(data);
         this.processData(data.msg)
-      }else{
-        this.chartLive.series[0].update({name: data.name, data: [0]});
-      }
+      // }else{
+      //   this.chartLive.series[0].update({name: data.name, data: [0]});
+      // }
 
     })
   }
@@ -153,12 +179,17 @@ export class ChartComponent implements OnInit {
   }
 
   addPoints(currency, price,flag) {
+    console.log(this.chartLive.series);
     if(price != undefined){
-    if(flag == 1){
-      this.chartLive.series[0].addPoint([this.positiveValue++, price]);
-    }else if(flag == 2){
-      this.chartLive.series[0].addPoint([this.negativeValue--, price]);
+
+      let x = (new Date()).getTime();
+      console.log(x);
+    if(flag != 4) {
+      this.chartLive.series[0].addPoint([x, price]);
     }
+    // }else if(flag == 2){
+    //   this.chartLive.series[1].addPoint([this.xAxis++, price]);
+    // }
 
     }
 
@@ -177,7 +208,7 @@ export class ChartComponent implements OnInit {
     this.socket.emit('getCoinLive',{
       msg: event.context.name
     });
-    this.chartLive.series[0].update({name: event.context.name, data: [0]});
+    this.chartLive.series[0].update({data: []});
     // this.chartLive.series[0].setData({
     //   data: []
     // });
