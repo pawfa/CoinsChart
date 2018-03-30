@@ -1,2 +1,2 @@
-# StockMarket
-Stock market chart application using NodeJS and Angular.
+# CoinsChart
+Cryptocurrency coins chart application using NodeJS and Angular.
