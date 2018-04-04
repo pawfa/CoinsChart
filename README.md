@@ -33,6 +33,14 @@ cd CoinsChart
 This will get a copy of the project installed locally.
 
 ### Executing program
+Before running the application you need to make sure that there is correct url in frontend directory in file data.service.ts:
+```bash
+this.socket = io.connect('http://localhost:3001/');
+```
+and in backend directory in file app.js
+```bash
+res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+```
 
 To run the server, cd into the `backend` folder and run:
  
