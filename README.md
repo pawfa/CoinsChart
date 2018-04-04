@@ -3,7 +3,7 @@ Cryptocurrency coins chart application using NodeJS and Angular.
 
 ## Description
 
-Example application to learn NodeJS and websockets. It shows history of cryptocurrency price and also live trade. You can see working demo [here](http://charts.pawfa.usermd.net/). Every code review and criticism is welcome.
+Example application to learn NodeJS and websockets. It shows history of cryptocurrency price and also live trade. Websockets allow to see checkbox and chart changes at the same time on all clients. You can see working demo [here](http://charts.pawfa.usermd.net/). Every code review and criticism is welcome.
 
 
 ## Getting Started
