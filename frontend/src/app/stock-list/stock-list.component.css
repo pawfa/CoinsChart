@@ -1,0 +1,45 @@
+
+.container-fluid{
+  list-style:none;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  padding: 10px;
+  border: 2px #c9f1fd solid;
+  background-color: white;
+}
+span{
+  margin-right: 20px;
+  padding-left: 25px !important;
+  font-family: 'Kanit', sans-serif;
+}
+form{
+  width: 90%;
+  margin: 20px auto;
+  text-align: center;
+}
+
+
+[type="checkbox"].filled-in:checked + span:not(.lever):after {
+  border: 2px #A0D6DB solid;
+  background-color: white;
+  width: 20px;
+  height: 20px;
+}
+[type="checkbox"].filled-in:checked+span:not(.lever):before{
+  top: 2px;
+  border-right: 2px #A0D6DB solid;
+  border-bottom: 2px #A0D6DB solid;
+}
+[type="checkbox"].filled-in:checked+ span:not(.lever):after{
+  top: 2px;
+}
+[type="checkbox"].filled-in:not(:checked)+span:not(.lever):after{
+  top: 2px;
+}
+
+
+

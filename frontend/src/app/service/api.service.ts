@@ -4,8 +4,8 @@ import {HttpClient, HttpHeaders, HttpParams} from '@angular/common/http';
 @Injectable()
 export class ApiService {
 
-  private server = 'http://localhost:3001/';
-  // private server = 'http://back_charts.pawfa.usermd.net:3001/';
+  // private server = 'http://localhost:3001/';
+  private server = 'http://back_charts.pawfa.usermd.net:3001/';
   private headers: HttpHeaders;
   private apiHistoricalData = 'https://min-api.cryptocompare.com/data/histoday?fsym=';
 

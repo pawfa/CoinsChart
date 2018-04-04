@@ -12,7 +12,6 @@ socket.on('m', (message) => {
 
 socket.on('connect', () => {
     console.log("connected to coin api");
-    // socket.emit('SubAdd', {subs: ['2~Poloniex~' + 'BTC' + '~USD']});
 
 });
 socket.on('disconnect', () => console.log('Disconnected.'));

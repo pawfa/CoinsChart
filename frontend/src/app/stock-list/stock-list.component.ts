@@ -10,14 +10,13 @@ import {FormArray, FormBuilder} from '@angular/forms';
 export class StockListComponent implements OnInit {
 
 
-  coinsSelected: Array<{}> = [];
+  private coinsSelected: Array<{}> = [];
+  private socket;
+  private coinsSelection;
   coins = {
     coinsSelected: []
   };
-  socket;
   form;
-  coinsSelection;
-
 
   constructor(private dataService: DataService, private fb: FormBuilder) {
     this.form = this.fb.group({

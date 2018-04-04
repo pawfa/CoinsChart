@@ -3,7 +3,7 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
-var cors = require('cors')
+var cors = require('cors');
 
 let stocksService = require('./services/stock_market.service');
 
@@ -68,25 +68,6 @@ io.on('connection', (socket) => {
         apiSocket.emit('SubAdd', {subs: ['2~Poloniex~' + message.msg + '~USD']})
 
     });
-
-
-    // socket.on('addCoin', (message) => {
-    //     console.log("added coin"+message.msg);
-    //     currencyNames.add(message.msg);
-    //     socket.broadcast.emit('addedCoin', {
-    //         msg: message.msg,
-    //         selected: true
-    //     });
-    // });
-
-    // socket.on('removeCoin', (message) => {
-    //     console.log(message.msg);
-    //     currencyNames.delete(message.msg);
-    //     io.sockets.emit('removedCoin', {
-    //         msg: message.msg,
-    //         selected: false
-    //     });
-    // });
 
 });
 

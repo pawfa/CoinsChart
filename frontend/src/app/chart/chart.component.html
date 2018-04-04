@@ -1,9 +1,14 @@
-
 <script src="https://code.highcharts.com/modules/no-data-to-display.js"></script>
-<div class="container" >
-<chart type="StockChart" [options]="optionsLong" (load)="saveInstanceLong($event.context)" >
-  <series (click)="onSeriesClick($event)">
-  </series>
-</chart>
-  <chart [options]="optionsLive" (load)="saveInstanceLive($event.context)"></chart>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col s6">
+    <chart type="StockChart" [options]="optionsLong" (load)="saveInstanceLong($event.context)">
+      <series (click)="onSeriesClick($event)">
+      </series>
+    </chart>
+    </div>
+    <div class="col s6">
+    <chart [options]="optionsLive" (load)="saveInstanceLive($event.context)"></chart>
+    </div>
+  </div>
 </div>
