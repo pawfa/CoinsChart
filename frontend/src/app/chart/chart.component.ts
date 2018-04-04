@@ -108,7 +108,6 @@ export class ChartComponent implements OnInit {
           style: {
             fontWeight: 'normal'
           },
-
         },
         opposite: true,
         plotLines: [{
@@ -129,7 +128,7 @@ export class ChartComponent implements OnInit {
       plotOptions: {
         series: {
           compare: 'percent'
-        }
+        },
       },
     };
 
@@ -250,11 +249,5 @@ export class ChartComponent implements OnInit {
       msg: event.context.name
     });
     this.chartLive.series[0].update({data: []});
-    // this.chartLive.series[0].setData({
-    //   data: []
-    // });
-    // this.chartLive.series[0].addPoint([1522344589138,7499.08305917 ], true, true);
-    // this.chartLive.series[0].addPoint([1,1 ], true, true);
-
   }
 }

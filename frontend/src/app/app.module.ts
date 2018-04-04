@@ -1,15 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
-import {CUSTOM_ELEMENTS_SCHEMA, NgModule} from '@angular/core';
-
-
 import { AppComponent } from './app.component';
 import { ChartComponent } from './chart/chart.component';
 import { StockListComponent } from './stock-list/stock-list.component';
-import {ApiService} from './service/api.service';
 import {DataService} from './service/data.service';
 import {HttpClientModule} from '@angular/common/http';
 import {ChartModule} from 'angular2-highcharts';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {NgModule} from '@angular/core';
 
 
 
@@ -30,7 +27,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     )
   ],
   providers: [
-    ApiService,
     DataService
   ],
   bootstrap: [AppComponent]

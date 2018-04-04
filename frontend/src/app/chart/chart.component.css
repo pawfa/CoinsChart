@@ -1,11 +1,9 @@
 chart{
   width: 100%;
   display: inline-block;
-  /*margin: 0 30px;*/
 }
 .container-fluid{
   border: 2px #c9f1fd solid;
   background-color: white;
   margin: 20px auto;
-  /*width: 100%;*/
 }

@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import {ApiService} from './api.service';
 import * as io from "socket.io-client";
 import {Subject} from 'rxjs/Subject';
 
@@ -9,7 +8,7 @@ export class DataService {
 
   coinsSelection = new Subject();
 
-  constructor(private apiService: ApiService) {
+  constructor() {
     this.socket = io.connect('http://back_charts.pawfa.usermd.net:3001');
     // this.socket = io.connect('http://localhost:3001/');
   }
