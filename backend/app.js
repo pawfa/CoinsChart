@@ -3,7 +3,8 @@ let express = require('express');
 let path = require('path');
 let cookieParser = require('cookie-parser');
 let logger = require('morgan');
-var cors = require('cors');
+let cors = require('cors');
+let schedule = require('node-schedule');
 
 let stocksService = require('./services/stock_market.service');
 
@@ -19,25 +20,29 @@ let currencyNames = [];
 let currencyHistoricalData = [];
 let coinLive = '';
 
-stocksService.getCurrencies().then(
-    function (result) {
-        let arr = [];
-        let i = 0;
-        result['Data'].map((e) => {
-            currencyNames.push(
-                {
-                    name: e['SYMBOL'],
-                    selected: false,
-                    id: i++
-                }
-            );
-            arr.push(stocksService.getCoinData(e['SYMBOL']), e['SYMBOL']);
-        });
-        return Promise.all(arr);
-    }
-).then(
-    (e) => currencyHistoricalData = e
-);
+let retrieveCurrencies = () => {
+    console.log('get curr');
+    stocksService.getCurrencies().then(
+        function (result) {
+            let arr = [];
+            let i = 0;
+            result['Data'].map((e) => {
+                currencyNames.push(
+                    {
+                        name: e['SYMBOL'],
+                        selected: false,
+                        id: i++
+                    }
+                );
+                arr.push(stocksService.getCoinData(e['SYMBOL']), e['SYMBOL']);
+            });
+            return Promise.all(arr);
+        }
+    ).then(
+        (e) => currencyHistoricalData = e
+    )
+};
+schedule.scheduleJob('0 0 * * *', retrieveCurrencies());
 
 io.on('connection', (socket) => {
 
