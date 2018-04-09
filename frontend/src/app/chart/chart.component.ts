@@ -197,7 +197,7 @@ export class ChartComponent implements OnInit {
         let data = [];
         for (let i = 0; i < coinData.length; i++) {
           data.push({
-            x: coinData[i]['time'] * 1000,
+            x: (coinData[i]['time']) * 1000,
             y: coinData[i]['open']
           });
         }
@@ -219,6 +219,7 @@ export class ChartComponent implements OnInit {
     let currency = unpackedData['FROMSYMBOL'];
     let price = unpackedData['PRICE'];
     let flag = unpackedData['FLAGS'];
+    console.log(unpackedData);
     this.addPoints(currency, price, flag);
 
   }
@@ -227,7 +228,7 @@ export class ChartComponent implements OnInit {
     console.log(this.chartLive.series);
     if (price != undefined) {
 
-      let x = (new Date()).getTime();
+      let x = (new Date()).getTime()+2*60*60*1000;
       console.log(x);
       if (flag != 4) {
         this.chartLive.series[0].addPoint([x, price]);

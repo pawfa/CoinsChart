@@ -6,23 +6,21 @@ let logger = require('morgan');
 let cors = require('cors');
 let schedule = require('node-schedule');
 
-let stocksService = require('./services/stock_market.service');
-
-let api = require('./routes/api.route');
+let coinsService = require('./services/coinsChart.service');
 
 let app = express();
 let server = require('http').Server(app);
 let io = require('socket.io')(server);
 server.listen(3001);
 
-let apiSocket = stocksService.getSocket();
+let apiSocket = coinsService.getSocket();
 let currencyNames = [];
 let currencyHistoricalData = [];
 let coinLive = '';
 
 let retrieveCurrencies = () => {
     console.log('get curr');
-    stocksService.getCurrencies().then(
+    coinsService.getCurrencies().then(
         function (result) {
             let arr = [];
             let i = 0;
@@ -34,7 +32,7 @@ let retrieveCurrencies = () => {
                         id: i++
                     }
                 );
-                arr.push(stocksService.getCoinData(e['SYMBOL']), e['SYMBOL']);
+                arr.push(coinsService.getCoinData(e['SYMBOL']), e['SYMBOL']);
             });
             return Promise.all(arr);
         }
@@ -42,6 +40,7 @@ let retrieveCurrencies = () => {
         (e) => currencyHistoricalData = e
     )
 };
+retrieveCurrencies();
 schedule.scheduleJob('0 0 * * *', retrieveCurrencies);
 
 io.on('connection', (socket) => {
@@ -98,7 +97,6 @@ app.use(function (req, res, next) {
     res.setHeader("Access-Control-Allow-Credentials", "true");
     next();
 });
-app.use('/api', api);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
