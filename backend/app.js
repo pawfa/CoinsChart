@@ -42,7 +42,7 @@ let retrieveCurrencies = () => {
         (e) => currencyHistoricalData = e
     )
 };
-schedule.scheduleJob('0 0 * * *', retrieveCurrencies());
+schedule.scheduleJob('0 0 * * *', retrieveCurrencies);
 
 io.on('connection', (socket) => {
 
