@@ -19,7 +19,7 @@ let currencyHistoricalData = [];
 let coinLive = '';
 
 let retrieveCurrencies = () => {
-    console.log('get curr');
+    currencyNames = [];
     coinsService.getCurrencies().then(
         function (result) {
             let arr = [];
