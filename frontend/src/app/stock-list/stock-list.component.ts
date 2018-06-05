@@ -13,10 +13,10 @@ export class StockListComponent implements OnInit {
   private coinsSelected: Array<{}> = [];
   private socket;
   private coinsSelection;
-  coins = {
+  private coins = {
     coinsSelected: []
   };
-  form;
+  private form;
 
   constructor(private dataService: DataService, private fb: FormBuilder) {
     this.form = this.fb.group({
@@ -29,21 +29,13 @@ export class StockListComponent implements OnInit {
 
 
   ngOnInit() {
-        this.socket.on('coinsList',
-          (data) => {
-          this.coins.coinsSelected = data.msg;
-          this.form = this.fb.group({
-              coinsSelected: this.buildSkills()
-            })
-        });
-
-    this.socket.on('changeCoinArray',
-      (data) => {
+    ['coinsList', 'changeCoinArray'].forEach(e => this.socket.on(e,
+      data => {
         this.coins.coinsSelected = data.msg;
         this.form = this.fb.group({
           coinsSelected: this.buildSkills()
-        })}
-    );
+        });
+      }));
   }
 
   get getCoins(): FormArray {
@@ -60,13 +52,13 @@ export class StockListComponent implements OnInit {
   }
 
   setSelected(target) {
-    var arr = this.coins.coinsSelected;
+    let arr = this.coins.coinsSelected;
     if (target.checked) {
-      this.coinsSelection.next([target.name,true]);
-      arr.filter((e) => e.name === target.name).map( (e) => e.selected = true);
+      this.coinsSelection.next([target.name, true]);
+      arr.filter((e) => e.name === target.name).map((e) => e.selected = true);
     } else {
-      this.coinsSelection.next([target.name,false]);
-      arr.filter((e) => e.name === target.name).map( (e) => e.selected = false);
+      this.coinsSelection.next([target.name, false]);
+      arr.filter((e) => e.name === target.name).map((e) => e.selected = false);
     }
 
     this.socket.emit('changeCoinArray', {
